@@ -80,6 +80,7 @@ export const fetchConversations = () => async (dispatch) => {
 
 const saveMessage = async (body) => {
   const { data } = await axios.post("/api/messages", body);
+  console.log(data)
   return data;
 };
 
@@ -96,13 +97,14 @@ const sendMessage = (data, body) => {
 export const postMessage = (body) => (dispatch) => {
   try {
     const data = saveMessage(body);
-
+    
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
     } else {
-      dispatch(setNewMessage(data.message));
+      
+      dispatch(setNewMessage(data.message, data.sender));
     }
-
+    
     sendMessage(data, body);
   } catch (error) {
     console.error(error);
