@@ -95,8 +95,9 @@ const sendMessage = (data, body) => {
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
 export const postMessage = (body) => (dispatch) => {
+  // Created another function that is asynchronous to get data from the API
   const getMessageData = async () => {
-    const data = await saveMessage(body)
+    const data = await saveMessage(body);
     
     if (!body.conversationId) {
           dispatch(addConversation(body.recipientId, data.message));
@@ -106,7 +107,7 @@ export const postMessage = (body) => (dispatch) => {
         
         sendMessage(data, body);
   };
-  getMessageData()
+  getMessageData();
 };
 
 export const searchUsers = (searchTerm) => async (dispatch) => {
