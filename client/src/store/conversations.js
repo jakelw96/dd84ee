@@ -26,14 +26,9 @@ export const gotConversations = (conversations) => {
 };
 
 export const setNewMessage = (message, sender) => {
-  const object = {
-    type: SET_MESSAGE,
-    payload: { message: message, sender: sender || null },
-  }
-  console.log(object)
   return {
     type: SET_MESSAGE,
-    payload: { message: message, sender: sender || null },
+    payload: { message, sender: sender || null },
   };
 };
 

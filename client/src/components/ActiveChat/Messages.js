@@ -9,7 +9,7 @@ const Messages = (props) => {
   messages.sort(function (x, y) {
     return x.createdAt.localeCompare(y.createdAt)
   })
-
+  
   return (
     <Box>
       {messages.map((message) => {
