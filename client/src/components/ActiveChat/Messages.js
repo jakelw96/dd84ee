@@ -5,12 +5,7 @@ import moment from "moment";
 
 const Messages = (props) => {
   const { messages, otherUser, userId } = props;
-  
-  // Using localCompare to sort messages from oldest to newest
-  messages.sort(function (x, y) {
-    return x.createdAt.localeCompare(y.createdAt)
-  });
-  
+
   return (
     <Box>
       {messages.map((message) => {
@@ -19,7 +14,12 @@ const Messages = (props) => {
         return message.senderId === userId ? (
           <SenderBubble key={message.id} text={message.text} time={time} />
         ) : (
-          <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />
+          <OtherUserBubble
+            key={message.id}
+            text={message.text}
+            time={time}
+            otherUser={otherUser}
+          />
         );
       })}
     </Box>
