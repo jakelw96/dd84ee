@@ -13,7 +13,13 @@ router.post("/", async (req, res, next) => {
 
     // if we already know conversation id, we can save time and just add it to message and return
     if (conversationId) {
-      const message = await Message.create({ senderId, text, conversationId });
+      const message = await Message.create({
+        senderId,
+        text,
+        isRead: false,
+        conversationId,
+      });
+      console.log(message);
       return res.json({ message, sender });
     }
     // if we don't have conversation id, find a conversation to make sure it doesn't already exist
@@ -35,6 +41,7 @@ router.post("/", async (req, res, next) => {
     const message = await Message.create({
       senderId,
       text,
+      isRead: false,
       conversationId: conversation.id,
     });
     res.json({ message, sender });
