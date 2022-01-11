@@ -87,3 +87,12 @@ export const addNewConvoToStore = (state, recipientId, message) => {
     }
   });
 };
+
+export const updateConversationMessages = (state, conversation) => {
+  if (conversation) {
+    console.log(state);
+    console.log(conversation);
+  } else {
+    return conversation;
+  }
+};

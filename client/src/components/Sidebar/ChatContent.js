@@ -37,12 +37,14 @@ const ChatContent = (props) => {
 
   const { conversation } = props;
   const { latestMessageText, otherUser } = conversation;
-  console.log(conversation);
+
   let unreadMessageCounter = 0;
 
   conversation.messages.forEach((message) => {
-    if (message.isRead === false) {
-      unreadMessageCounter += 1;
+    if (message.senderId === conversation.otherUser.id) {
+      if (message.isRead === false) {
+        unreadMessageCounter += 1;
+      }
     }
   });
 
@@ -56,7 +58,7 @@ const ChatContent = (props) => {
           {latestMessageText}
         </Typography>
       </Box>
-      {/* If there are unread messages, display notifcation counter */}
+      {/* If there are unread messages, display notification counter */}
       {unreadMessageCounter > 0 && (
         <Box className={classes.messageNotification}>
           <Typography>{unreadMessageCounter}</Typography>

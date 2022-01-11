@@ -16,7 +16,6 @@ router.post("/", async (req, res, next) => {
       const message = await Message.create({
         senderId,
         text,
-        isRead: false,
         conversationId,
       });
       console.log(message);
@@ -41,10 +40,36 @@ router.post("/", async (req, res, next) => {
     const message = await Message.create({
       senderId,
       text,
-      isRead: false,
       conversationId: conversation.id,
     });
     res.json({ message, sender });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/", (req, res, next) => {
+  const conversation = req.body;
+
+  try {
+    // Loop through each message and mark all as read
+    conversation.messages.forEach((message) => {
+      if (message.senderId === conversation.otherUser.id) {
+        message.isRead = true;
+
+        Message.update(
+          {
+            isRead: true,
+          },
+          {
+            where: {
+              id: message.id,
+            },
+          }
+        );
+      }
+    });
+    res.json(conversation);
   } catch (error) {
     next(error);
   }

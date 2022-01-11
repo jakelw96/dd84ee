@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  updateConversation,
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -89,7 +90,7 @@ export const fetchConversations = () => async (dispatch) => {
 
 const saveMessage = async (body) => {
   const { data } = await axios.post("/api/messages", body);
-  
+
   return data;
 };
 
@@ -105,7 +106,7 @@ const sendMessage = (data, body) => {
 // conversationId will be set to null if its a brand new conversation
 export const postMessage = (body) => async (dispatch) => {
   const data = await saveMessage(body);
-  
+
   if (!body.conversationId) {
     dispatch(addConversation(body.recipientId, data.message));
   } else {
@@ -122,4 +123,21 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+const updateMessages = async (convo) => {
+  // Updates database to reflect messages that were read
+  const { data } = await axios.put("/api/messages/", convo);
+
+  return data;
+};
+
+export const updateUnreadMessages = (convo) => (dispatch) => {
+  const data =  updateMessages(convo);
+  console.log(data);
+  // if (data) {
+  //   dispatch(updateConversation(data.messages));
+  // } else {
+  //   console.log("Nothing to return from the API ");
+  // }
 };
