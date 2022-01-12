@@ -1,19 +1,16 @@
-import { updateConversationMessages } from "./utils/reducerFunctions";
-
 const SET_ACTIVE_CHAT = "SET_ACTIVE_CHAT";
 
-export const setActiveChat = (conversation) => {
+export const setActiveChat = (username) => {
   return {
     type: SET_ACTIVE_CHAT,
-    conversation,
+    username,
   };
 };
 
 const reducer = (state = "", action) => {
   switch (action.type) {
     case SET_ACTIVE_CHAT: {
-      // return action.conversation.otherUser.username;
-      return updateConversationMessages(state, action.conversation);
+      return action.username;
     }
     default:
       return state;

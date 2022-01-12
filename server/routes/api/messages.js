@@ -55,8 +55,6 @@ router.put("/", (req, res, next) => {
     // Loop through each message and mark all as read
     conversation.messages.forEach((message) => {
       if (message.senderId === conversation.otherUser.id) {
-        message.isRead = true;
-
         Message.update(
           {
             isRead: true,

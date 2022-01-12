@@ -69,10 +69,10 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
-export const updateConversation = (messages) => {
+export const updateConversation = (convoId) => {
   return {
     type: UPDATE_CONVERSATION,
-    payload: { messages },
+    convoId,
   };
 };
 
@@ -101,7 +101,7 @@ const reducer = (state = [], action) => {
         action.payload.newMessage
       );
     case UPDATE_CONVERSATION:
-      return updateConversationMessages(state, action.payload);
+      return updateConversationMessages(state, action.convoId);
     default:
       return state;
   }

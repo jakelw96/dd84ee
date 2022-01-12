@@ -132,12 +132,8 @@ const updateMessages = async (convo) => {
   return data;
 };
 
-export const updateUnreadMessages = (convo) => (dispatch) => {
-  const data =  updateMessages(convo);
+export const updateUnreadMessages = (convo) => async (dispatch) => {
+  const data = await updateMessages(convo);
   console.log(data);
-  // if (data) {
-  //   dispatch(updateConversation(data.messages));
-  // } else {
-  //   console.log("Nothing to return from the API ");
-  // }
+  dispatch(updateConversation(data.id));
 };
