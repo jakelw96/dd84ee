@@ -48,6 +48,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// Updates messages isRead value to true only if it was sent by the otherUser
 router.put("/", (req, res, next) => {
   const conversation = req.body;
 

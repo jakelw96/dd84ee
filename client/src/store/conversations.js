@@ -69,6 +69,7 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
+// Updates a conversations messages for isRead
 export const updateConversation = (convoId) => {
   return {
     type: UPDATE_CONVERSATION,

@@ -132,8 +132,9 @@ const updateMessages = async (convo) => {
   return data;
 };
 
+// Thunk to update unread messages
 export const updateUnreadMessages = (convo) => async (dispatch) => {
   const data = await updateMessages(convo);
-  console.log(data);
+
   dispatch(updateConversation(data.id));
 };
