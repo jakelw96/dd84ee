@@ -91,7 +91,7 @@ export const addNewConvoToStore = (state, recipientId, message) => {
 // Reducer function that updates the conversations messages isRead boolean
 export const updateConversationMessages = (state, convoId) => {
   return state.map((convo) => {
-    if (convo.id === convoId) {
+    if (convo.id === convoId) { // If a convo in state's ID === convo currently selected
       return {
         ...convo,
         messages: convo.messages.map((message) => {

@@ -105,15 +105,19 @@ const sendMessage = (data, body) => {
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
 export const postMessage = (body) => async (dispatch) => {
-  const data = await saveMessage(body);
+  try {
+    const data = await saveMessage(body);
 
-  if (!body.conversationId) {
-    dispatch(addConversation(body.recipientId, data.message));
-  } else {
-    dispatch(setNewMessage(data.message, data.sender));
+    if (!body.conversationId) {
+      dispatch(addConversation(body.recipientId, data.message));
+    } else {
+      dispatch(setNewMessage(data.message, data.sender));
+    }
+
+    sendMessage(data, body);
+  } catch (error) {
+    console.error(error);
   }
-
-  sendMessage(data, body);
 };
 
 export const searchUsers = (searchTerm) => async (dispatch) => {
@@ -134,7 +138,11 @@ const updateMessages = async (convo) => {
 
 // Thunk to update unread messages
 export const updateUnreadMessages = (convo) => async (dispatch) => {
-  const data = await updateMessages(convo);
+  try {
+    const data = await updateMessages(convo);
 
-  dispatch(updateConversation(data.id));
+    dispatch(updateConversation(data.id));
+  } catch (error) {
+    console.error(error);
+  }
 };

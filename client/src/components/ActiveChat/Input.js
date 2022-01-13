@@ -43,7 +43,7 @@ const Input = (props) => {
     setText("");
   };
 
-  // Updates messages to reflect last message read in when both users are in the chat
+  // Updates messages to reflect last message read when both users are in the chat
   const handleClick = async (conversation) => {
     await props.updateUnreadMessages(conversation);
   };

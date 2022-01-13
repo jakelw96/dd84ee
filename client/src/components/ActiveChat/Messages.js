@@ -5,7 +5,7 @@ import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
 
 const useStyles = makeStyles(() => ({
-  profilePic: {
+  readIcon: {
     height: 23,
     width: 23,
     borderRadius: 50,
@@ -54,7 +54,7 @@ const Messages = (props) => {
                 key={otherUser.id}
                 src={otherUser.photoUrl}
                 alt="Read"
-                className={classes.profilePic}
+                className={classes.readIcon}
               />
             )}
           </>
