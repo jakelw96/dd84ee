@@ -13,7 +13,12 @@ router.post("/", async (req, res, next) => {
 
     // if we already know conversation id, we can save time and just add it to message and return
     if (conversationId) {
-      const message = await Message.create({ senderId, text, conversationId });
+      const message = await Message.create({
+        senderId,
+        text,
+        conversationId,
+      });
+      console.log(message);
       return res.json({ message, sender });
     }
     // if we don't have conversation id, find a conversation to make sure it doesn't already exist
@@ -38,6 +43,32 @@ router.post("/", async (req, res, next) => {
       conversationId: conversation.id,
     });
     res.json({ message, sender });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Updates messages isRead value to true only if it was sent by the otherUser
+router.put("/", (req, res, next) => {
+  const conversation = req.body;
+
+  try {
+    // Loop through each message and mark all as read
+    conversation.messages.forEach((message) => {
+      if (message.senderId === conversation.otherUser.id) {
+        Message.update(
+          {
+            isRead: true,
+          },
+          {
+            where: {
+              id: message.id,
+            },
+          }
+        );
+      }
+    });
+    res.json(conversation);
   } catch (error) {
     next(error);
   }
