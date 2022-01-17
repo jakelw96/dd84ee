@@ -4,7 +4,9 @@ import {
   setNewMessage,
   removeOfflineUser,
   addOnlineUser,
+  updateCurrentConversation,
 } from "./store/conversations";
+import { updateConversationData } from "./store/utils/thunkCreators";
 
 const socket = io(window.location.origin);
 
@@ -20,6 +22,12 @@ socket.on("connect", () => {
   });
   socket.on("new-message", (data) => {
     store.dispatch(setNewMessage(data.message, data.sender));
+  });
+  socket.on("update-conversation", (conversation) => {
+    store.dispatch(updateConversationData(conversation));
+  });
+  socket.on("update-curr-convo", (data) => {
+    store.dispatch(updateCurrentConversation(data.userId, data.currConvoId));
   });
 });
 

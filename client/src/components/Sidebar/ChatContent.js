@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@material-ui/core";
+import { Box, Typography, Badge } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -35,18 +35,17 @@ const useStyles = makeStyles((theme) => ({
 const ChatContent = (props) => {
   const classes = useStyles();
 
-  const { conversation } = props;
-  const { latestMessageText, otherUser } = conversation;
+  const { conversation, user } = props;
+  const { latestMessageText, otherUser, usersInConvo } = conversation;
+  let count;
 
-  let unreadMessageCounter = 0;
-
-  conversation.messages.forEach((message) => {
-    if (message.senderId === conversation.otherUser.id) {
-      if (message.isRead === false) {
-        unreadMessageCounter += 1;
-      }
-    }
-  });
+  if (usersInConvo) {
+    count = usersInConvo.find(
+      (currUser) => currUser.userId === user.id
+    ).unreadMessagesCount;
+  } else {
+    count = 0;
+  }
 
   return (
     <Box className={classes.root}>
@@ -54,15 +53,22 @@ const ChatContent = (props) => {
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText}>
-          {latestMessageText}
-        </Typography>
+        {count > 0 ? (
+          <Typography
+            className={classes.previewText}
+            style={{ fontWeight: "bold", color: "black", fontSize: 14 }}
+          >
+            {latestMessageText}
+          </Typography>
+        ) : (
+          <Typography className={classes.previewText}>
+            {latestMessageText}
+          </Typography>
+        )}
       </Box>
       {/* If there are unread messages, display notification counter */}
-      {unreadMessageCounter > 0 && (
-        <Box className={classes.messageNotification}>
-          <Typography>{unreadMessageCounter}</Typography>
-        </Box>
+      {count > 0 && (
+        <Badge className={classes.messageNotification}>{count}</Badge>
       )}
     </Box>
   );

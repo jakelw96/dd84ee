@@ -1,7 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
+import { connect } from "react-redux";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
+import { updateConversationData } from "../../store/utils/thunkCreators";
 import moment from "moment";
 
 const useStyles = makeStyles(() => ({
@@ -15,25 +17,18 @@ const useStyles = makeStyles(() => ({
 
 const Messages = (props) => {
   const classes = useStyles();
-  const { messages, otherUser, userId } = props;
+  const { conversation, user } = props;
 
-  // Function to filter array and return the ID for the last read message
-  // from the other user
-  const lastMessageRead = () => {
-    let filteredArr = [];
-
-    messages.forEach((message) => {
-      if (message.senderId !== otherUser.id) {
-        if (message.isRead === true) {
-          filteredArr.push(message);
-        }
+  const updateMessages = () => {
+    if (conversation.usersInConvo) {
+      const currUserMessageData = conversation.usersInConvo.find(
+        (data) => data.userId === conversation.otherUser.id
+      );
+      if (currUserMessageData.lastReadMessage) {
+        return currUserMessageData.lastReadMessage.id;
+      } else {
+        return false;
       }
-    });
-
-    const latestMessage = filteredArr[filteredArr.length - 1];
-
-    if (latestMessage) {
-      return latestMessage.id;
     } else {
       return false;
     }
@@ -41,29 +36,28 @@ const Messages = (props) => {
 
   return (
     <Box>
-      {messages.map((message) => {
+      {conversation.messages.map((message) => {
         const time = moment(message.createdAt).format("h:mm");
 
-        return message.senderId === userId ? (
-          <>
-            <SenderBubble key={message.id} text={message.text} time={time} />
+        return message.senderId === user.id ? (
+          <Box key={message.id}>
+            <SenderBubble text={message.text} time={time} />
             {/* Profile image icon indicating a message was read,
             only appears when the last messages from other user is read */}
-            {lastMessageRead() === message.id && (
+            {updateMessages() === message.id && (
               <img
-                key={otherUser.id}
-                src={otherUser.photoUrl}
+                src={conversation.otherUser.photoUrl}
                 alt="Read"
                 className={classes.readIcon}
               />
             )}
-          </>
+          </Box>
         ) : (
           <OtherUserBubble
             key={message.id}
             text={message.text}
             time={time}
-            otherUser={otherUser}
+            otherUser={conversation.otherUser}
           />
         );
       })}
@@ -71,4 +65,12 @@ const Messages = (props) => {
   );
 };
 
-export default Messages;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateConversationData: (conversation) => {
+      dispatch(updateConversationData(conversation));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Messages);

@@ -1,5 +1,13 @@
+import {
+  countUnreadMessages,
+  getLastReadMessage,
+  updateCurrentUser,
+  updateOtherUser,
+  updateBothUsers,
+} from "./helpers";
+
 export const addMessageToStore = (state, payload) => {
-  const { message, sender } = payload;
+  const { message, sender, recipientId } = payload;
 
   // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
@@ -9,6 +17,30 @@ export const addMessageToStore = (state, payload) => {
       messages: [message],
     };
     newConvo.latestMessageText = message.text;
+    newConvo.usersInConvo = [
+      {
+        userId: recipientId,
+        currActiveConvo: null,
+        lastReadMessage: getLastReadMessage(recipientId, newConvo.messages),
+        unreadMessagesCount: countUnreadMessages(
+          recipientId,
+          newConvo.messages
+        ),
+      },
+      {
+        userId: message.senderId,
+        currActiveConvo: null,
+        lastReadMessage: getLastReadMessage(
+          message.senderId,
+          newConvo.messages
+        ),
+        unreadMessagesCount: countUnreadMessages(
+          message.senderId,
+          newConvo.messages
+        ),
+      },
+    ];
+
     return [newConvo, ...state];
   }
 
@@ -20,6 +52,19 @@ export const addMessageToStore = (state, payload) => {
         ...convo,
         messages: [...convo.messages, message],
         latestMessageText: message.text,
+        usersInConvo: convo.usersInConvo.map((user) => {
+          return {
+            ...user,
+            lastReadMessage: getLastReadMessage(user.userId, [
+              ...convo.messages,
+              message,
+            ]),
+            unreadMessagesCount: countUnreadMessages(user.userId, [
+              ...convo.messages,
+              message,
+            ]),
+          };
+        }),
       };
     } else {
       return convo;
@@ -81,6 +126,32 @@ export const addNewConvoToStore = (state, recipientId, message) => {
         id: message.conversationId,
         messages: [...convo.messages, message],
         latestMessageText: message.text,
+        usersInConvo: [
+          {
+            userId: recipientId,
+            currActiveConvo: null,
+            lastReadMessage: getLastReadMessage(recipientId, [
+              ...convo.messages,
+              message,
+            ]),
+            unreadMessagesCount: countUnreadMessages(recipientId, [
+              ...convo.messages,
+              message,
+            ]),
+          },
+          {
+            userId: message.senderId,
+            currActiveConvo: null,
+            lastReadMessage: getLastReadMessage(message.senderId, [
+              ...convo.messages,
+              message,
+            ]),
+            unreadMessagesCount: countUnreadMessages(message.senderId, [
+              ...convo.messages,
+              message,
+            ]),
+          },
+        ],
       };
     } else {
       return convo;
@@ -88,23 +159,43 @@ export const addNewConvoToStore = (state, recipientId, message) => {
   });
 };
 
-// Reducer function that updates the conversations messages isRead boolean
-export const updateConversationMessages = (state, convoId) => {
+export const updateConversationData = (state, payload) => {
+  const { convoId, activeConvo } = payload;
+
   return state.map((convo) => {
-    if (convo.id === convoId) { // If a convo in state's ID === convo currently selected
-      return {
-        ...convo,
-        messages: convo.messages.map((message) => {
-          if (message.senderId === convo.otherUser.id) {
-            message.isRead = true;
-            return message;
-          } else {
-            return message;
-          }
-        }),
-      };
+    if (convo.id === convoId && convo.messages.length > 0) {
+      if (activeConvo === convo.otherUser.username) {
+        if (
+          convo.usersInConvo.every((user) => {
+            return user.currActiveConvo === convoId;
+          })
+        ) {
+          return updateBothUsers(convo);
+        } else {
+          return updateCurrentUser(convo);
+        }
+      } else {
+        return updateOtherUser(convo);
+      }
     } else {
       return convo;
     }
+  });
+};
+
+export const updateCurrentActiveConversation = (state, payload) => {
+  const { userId, currConvoId } = payload;
+  return state.map((convo) => {
+    return {
+      ...convo,
+      usersInConvo: convo.usersInConvo.map((user) => {
+        if (user.userId === userId) {
+          user.currActiveConvo = currConvoId;
+          return user;
+        } else {
+          return user;
+        }
+      }),
+    };
   });
 };

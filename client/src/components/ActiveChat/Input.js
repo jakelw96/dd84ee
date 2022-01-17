@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { FormControl, FilledInput } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
-import {
-  postMessage,
-  updateUnreadMessages,
-} from "../../store/utils/thunkCreators";
+import { postMessage } from "../../store/utils/thunkCreators";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -37,15 +34,13 @@ const Input = (props) => {
       recipientId: otherUser.id,
       conversationId,
       sender: conversationId ? null : user,
+      otherUser: otherUser.username,
+      conversation,
     };
 
     await postMessage(reqBody);
-    setText("");
-  };
 
-  // Updates messages to reflect last message read when both users are in the chat
-  const handleClick = async (conversation) => {
-    await props.updateUnreadMessages(conversation);
+    setText("");
   };
 
   return (
@@ -58,7 +53,6 @@ const Input = (props) => {
           value={text}
           name="text"
           onChange={handleChange}
-          onClick={() => handleClick(conversation)}
         />
       </FormControl>
     </form>
@@ -69,9 +63,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     postMessage: (message) => {
       dispatch(postMessage(message));
-    },
-    updateUnreadMessages: (conversation) => {
-      dispatch(updateUnreadMessages(conversation));
     },
   };
 };

@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const e = require("express");
 const { Conversation, Message } = require("../../db/models");
 const onlineUsers = require("../../onlineUsers");
 
@@ -18,7 +19,7 @@ router.post("/", async (req, res, next) => {
         text,
         conversationId,
       });
-      console.log(message);
+
       return res.json({ message, sender });
     }
     // if we don't have conversation id, find a conversation to make sure it doesn't already exist
@@ -48,27 +49,34 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// Updates messages isRead value to true only if it was sent by the otherUser
 router.put("/", (req, res, next) => {
   const conversation = req.body;
 
   try {
-    // Loop through each message and mark all as read
-    conversation.messages.forEach((message) => {
-      if (message.senderId === conversation.otherUser.id) {
-        Message.update(
-          {
-            isRead: true,
-          },
-          {
-            where: {
-              id: message.id,
-            },
-          }
-        );
+    if (!req.user) {
+      return res.sendStatus(401);
+    } else {
+      const usersInConvoIDs = conversation.usersInConvo.map((user) => {
+        return user.userId;
+      });
+
+      if (!usersInConvoIDs.includes(req.user.dataValues.id)) {
+        return res.sendStatus(403);
       }
-    });
-    res.json(conversation);
+    }
+
+    Message.update(
+      {
+        isRead: true,
+      },
+      {
+        where: {
+          senderId: conversation.otherUser.id,
+        },
+      }
+    );
+
+    res.json(conversation.id);
   } catch (error) {
     next(error);
   }

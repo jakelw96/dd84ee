@@ -47,6 +47,38 @@ router.get("/", async (req, res, next) => {
       ],
     });
 
+    const countUnreadMessages = (userId, messages) => {
+      let unreadMessageCounter = 0;
+
+      messages.forEach((message) => {
+        if (userId !== message.senderId) {
+          if (message.isRead === false) {
+            unreadMessageCounter += 1;
+          }
+        }
+      });
+
+      return unreadMessageCounter;
+    };
+
+    const getLastReadMessage = (userId, messages) => {
+      let readMessages = [];
+
+      messages.forEach((message) => {
+        if (userId !== message.senderId) {
+          if (message.isRead === true) {
+            readMessages.push(message);
+          }
+        }
+      });
+
+      if (readMessages.length > 0) {
+        return readMessages[readMessages.length - 1];
+      } else {
+        return null;
+      }
+    };
+
     for (let i = 0; i < conversations.length; i++) {
       const convo = conversations[i];
       const convoJSON = convo.toJSON();
@@ -67,8 +99,33 @@ router.get("/", async (req, res, next) => {
         convoJSON.otherUser.online = false;
       }
 
-      // set properties for notification count and latest message preview
+      // set properties for notification count and latest message preview and
+      // unread message object for both users
       convoJSON.latestMessageText = convoJSON.messages[0].text;
+      convoJSON.usersInConvo = [
+        {
+          userId: req.user.id,
+          currActiveConvo: null,
+          lastReadMessage: getLastReadMessage(req.user.id, convoJSON.messages),
+          unreadMessagesCount: countUnreadMessages(
+            req.user.id,
+            convoJSON.messages
+          ),
+        },
+        {
+          userId: convoJSON.otherUser.id,
+          currActiveConvo: null,
+          lastReadMessage: getLastReadMessage(
+            convoJSON.otherUser.id,
+            convoJSON.messages
+          ),
+          unreadMessagesCount: countUnreadMessages(
+            convoJSON.otherUser.id,
+            convoJSON.messages
+          ),
+        },
+      ];
+
       conversations[i] = convoJSON;
     }
 
