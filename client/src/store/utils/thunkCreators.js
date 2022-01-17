@@ -139,8 +139,11 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-const updateMessages = async (conversation) => {
-  const { data } = await axios.put("/api/messages/", conversation);
+const updateMessages = async (conversation, activeConversation) => {
+  const { data } = await axios.put("/api/messages/", {
+    conversation,
+    activeConversation,
+  });
 
   return data;
 };
@@ -150,7 +153,10 @@ export const updateConversationData =
     try {
       const state = getState();
 
-      const convoId = await updateMessages(conversation);
+      const convoId = await updateMessages(
+        conversation,
+        state.activeConversation
+      );
 
       dispatch(updateConversation(convoId, state.activeConversation));
     } catch (error) {

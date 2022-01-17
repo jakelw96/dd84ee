@@ -50,31 +50,58 @@ router.post("/", async (req, res, next) => {
 });
 
 router.put("/", (req, res, next) => {
-  const conversation = req.body;
+  const { conversation, activeConversation } = req.body;
 
   try {
+    const usersInConvoIDs = conversation.usersInConvo.map((user) => {
+      return user.userId;
+    });
+
     if (!req.user) {
       return res.sendStatus(401);
     } else {
-      const usersInConvoIDs = conversation.usersInConvo.map((user) => {
-        return user.userId;
-      });
-
       if (!usersInConvoIDs.includes(req.user.dataValues.id)) {
         return res.sendStatus(403);
       }
     }
 
-    Message.update(
-      {
-        isRead: true,
-      },
-      {
-        where: {
-          senderId: conversation.otherUser.id,
-        },
+    if (conversation.messages.length > 0) {
+      if (activeConversation === conversation.otherUser.username) {
+        if (
+          conversation.usersInConvo.every((user) => {
+            return user.currActiveConvo === conversation.id;
+          })
+        ) {
+          Message.update({
+            isRead: true,
+          });
+        } else {
+          Message.update(
+            {
+              isRead: true,
+            },
+            {
+              where: {
+                senderId: conversation.otherUser.id,
+              },
+            }
+          );
+        }
+      } else {
+        Message.update(
+          {
+            isRead: true,
+          },
+          {
+            where: {
+              senderId: usersInConvoIDs.find(
+                (userId) => userId !== conversation.otherUser.id
+              ),
+            },
+          }
+        );
       }
-    );
+    }
 
     res.json(conversation.id);
   } catch (error) {
