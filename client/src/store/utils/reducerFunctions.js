@@ -7,7 +7,7 @@ import {
 } from "./helpers";
 
 export const addMessageToStore = (state, payload) => {
-  const { message, sender, recipientId } = payload;
+  const { message, sender, recipientId, currUserId } = payload;
 
   // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
@@ -19,7 +19,7 @@ export const addMessageToStore = (state, payload) => {
     newConvo.latestMessageText = message.text;
     newConvo.usersInConvo = [
       {
-        userId: recipientId,
+        userId: recipientId ? recipientId : currUserId,
         currActiveConvo: null,
         lastReadMessage: getLastReadMessage(recipientId, newConvo.messages),
         unreadMessagesCount: countUnreadMessages(
@@ -48,6 +48,7 @@ export const addMessageToStore = (state, payload) => {
     if (convo.id === message.conversationId) {
       // Returning a new object with original data and updating the latestMessageText
       // and messages array with the new message
+
       return {
         ...convo,
         messages: [...convo.messages, message],
@@ -121,6 +122,8 @@ export const addNewConvoToStore = (state, recipientId, message) => {
     if (convo.otherUser.id === recipientId) {
       // Returning a new object with the original state and updated with id,
       // messages, and latestMessageText
+      console.log(convo);
+      console.log(recipientId);
       return {
         ...convo,
         id: message.conversationId,
@@ -186,16 +189,20 @@ export const updateConversationData = (state, payload) => {
 export const updateCurrentActiveConversation = (state, payload) => {
   const { userId, currConvoId } = payload;
   return state.map((convo) => {
-    return {
-      ...convo,
-      usersInConvo: convo.usersInConvo.map((user) => {
-        if (user.userId === userId) {
-          user.currActiveConvo = currConvoId;
-          return user;
-        } else {
-          return user;
-        }
-      }),
-    };
+    if (convo.usersInConvo) {
+      return {
+        ...convo,
+        usersInConvo: convo.usersInConvo.map((user) => {
+          if (user.userId === userId) {
+            user.currActiveConvo = currConvoId;
+            return user;
+          } else {
+            return user;
+          }
+        }),
+      };
+    } else {
+      return convo;
+    }
   });
 };

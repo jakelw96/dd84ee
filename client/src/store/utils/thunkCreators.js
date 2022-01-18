@@ -123,8 +123,10 @@ export const postMessage = (body) => async (dispatch, getState) => {
     }
 
     sendMessage(data, body);
-    updateConvo(body.conversation);
-    dispatch(updateConversationData(body.conversation));
+    if (body.conversation.usersInConvo) {
+      updateConvo(body.conversation);
+      dispatch(updateConversationData(body.conversation));
+    }
   } catch (error) {
     console.error(error);
   }

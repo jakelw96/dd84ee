@@ -43,6 +43,7 @@ router.post("/", async (req, res, next) => {
       text,
       conversationId: conversation.id,
     });
+
     res.json({ message, sender });
   } catch (error) {
     next(error);

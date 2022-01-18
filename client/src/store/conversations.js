@@ -32,7 +32,11 @@ export const gotConversations = (conversations) => {
 export const setNewMessage = (message, sender, recipientId) => {
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null, recipientId },
+    payload: {
+      message,
+      sender: sender || null,
+      recipientId: recipientId ? recipientId : message.recipientId,
+    },
   };
 };
 
