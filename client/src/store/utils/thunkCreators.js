@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  updateConversation,
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -101,19 +102,32 @@ const sendMessage = (data, body) => {
   });
 };
 
+export const updateConvo = (conversation) => {
+  socket.emit("update-conversation", conversation);
+};
+
+export const updateCurrConvo = (userId, currConvoId) => {
+  socket.emit("update-curr-convo", { userId, currConvoId });
+};
+
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
-export const postMessage = (body) => async (dispatch) => {
+export const postMessage = (body) => async (dispatch, getState) => {
   try {
     const data = await saveMessage(body);
+    const state = getState();
 
     if (!body.conversationId) {
-      dispatch(addConversation(body.recipientId, data.message));
+      dispatch(addConversation(body.recipientId, data.message, state.user.id));
     } else {
-      dispatch(setNewMessage(data.message, data.sender));
+      dispatch(setNewMessage(data.message, data.sender, body.recipientId));
     }
 
     sendMessage(data, body);
+    if (body.conversation.usersInConvo) {
+      updateConvo(body.conversation);
+      dispatch(updateConversationData(body.conversation));
+    }
   } catch (error) {
     console.error(error);
   }
@@ -127,3 +141,28 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+const updateMessages = async (conversation, activeConversation) => {
+  const { data } = await axios.put("/api/messages/", {
+    conversation,
+    activeConversation,
+  });
+
+  return data;
+};
+
+export const updateConversationData =
+  (conversation) => async (dispatch, getState) => {
+    try {
+      const state = getState();
+
+      const convoId = await updateMessages(
+        conversation,
+        state.activeConversation
+      );
+
+      dispatch(updateConversation(convoId, state.activeConversation));
+    } catch (error) {
+      console.error(error);
+    }
+  };

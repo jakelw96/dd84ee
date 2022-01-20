@@ -4,6 +4,8 @@ import {
   addSearchedUsersToStore,
   removeOfflineUserFromStore,
   addMessageToStore,
+  updateConversationData,
+  updateCurrentActiveConversation,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -15,6 +17,8 @@ const REMOVE_OFFLINE_USER = "REMOVE_OFFLINE_USER";
 const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
+const UPDATE_CONVERSATION = "UPDATE_CONVERSATION";
+const UPDATE_CURRENT_ACTIVE_CONVERSATION = "UPDATE_CURRENT_ACTIVE_CONVERSATION";
 
 // ACTION CREATORS
 
@@ -25,10 +29,14 @@ export const gotConversations = (conversations) => {
   };
 };
 
-export const setNewMessage = (message, sender) => {
+export const setNewMessage = (message, sender, recipientId) => {
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null },
+    payload: {
+      message,
+      sender: sender || null,
+      recipientId: recipientId ? recipientId : message.recipientId,
+    },
   };
 };
 
@@ -60,10 +68,24 @@ export const clearSearchedUsers = () => {
 };
 
 // add new conversation when sending a new message
-export const addConversation = (recipientId, newMessage) => {
+export const addConversation = (recipientId, newMessage, currUserId) => {
   return {
     type: ADD_CONVERSATION,
-    payload: { recipientId, newMessage },
+    payload: { recipientId, newMessage, currUserId },
+  };
+};
+
+export const updateConversation = (convoId, activeConvo) => {
+  return {
+    type: UPDATE_CONVERSATION,
+    payload: { convoId, activeConvo },
+  };
+};
+
+export const updateCurrentConversation = (userId, currConvoId) => {
+  return {
+    type: UPDATE_CURRENT_ACTIVE_CONVERSATION,
+    payload: { userId, currConvoId },
   };
 };
 
@@ -89,8 +111,13 @@ const reducer = (state = [], action) => {
       return addNewConvoToStore(
         state,
         action.payload.recipientId,
-        action.payload.newMessage
+        action.payload.newMessage,
+        action.payload.currUserId
       );
+    case UPDATE_CONVERSATION:
+      return updateConversationData(state, action.payload);
+    case UPDATE_CURRENT_ACTIVE_CONVERSATION:
+      return updateCurrentActiveConversation(state, action.payload);
     default:
       return state;
   }
