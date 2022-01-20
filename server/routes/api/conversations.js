@@ -47,27 +47,24 @@ router.get("/", async (req, res, next) => {
       ],
     });
 
-    const countUnreadMessages = (userId, messages) => {
-      let unreadMessageCounter = 0;
-
-      messages.forEach((message) => {
-        if (userId !== message.senderId) {
-          if (message.isRead === false) {
-            unreadMessageCounter += 1;
-          }
-        }
+    const countUnreadMessages = async (otherUser) => {
+      const unreadMessageCounter = await Message.count({
+        where: {
+          isRead: false,
+          senderId: otherUser,
+        },
+      }).then((count) => {
+        return count;
       });
 
       return unreadMessageCounter;
     };
 
     const getLastReadMessage = (userId, messages) => {
-      let readMessages = [];
-
-      messages.forEach((message) => {
+      const readMessages = messages.filter((message) => {
         if (userId !== message.senderId) {
           if (message.isRead === true) {
-            readMessages.push(message);
+            return message;
           }
         }
       });
@@ -107,9 +104,8 @@ router.get("/", async (req, res, next) => {
           userId: req.user.id,
           currActiveConvo: null,
           lastReadMessage: getLastReadMessage(req.user.id, convoJSON.messages),
-          unreadMessagesCount: countUnreadMessages(
-            req.user.id,
-            convoJSON.messages
+          unreadMessagesCount: await countUnreadMessages(
+            convoJSON.otherUser.id
           ),
         },
         {
@@ -119,14 +115,13 @@ router.get("/", async (req, res, next) => {
             convoJSON.otherUser.id,
             convoJSON.messages
           ),
-          unreadMessagesCount: countUnreadMessages(
-            convoJSON.otherUser.id,
-            convoJSON.messages
-          ),
+          unreadMessagesCount: await countUnreadMessages(req.user.id),
         },
       ];
-
-      conversations[i] = convoJSON;
+      (convoJSON.currUserInConvoArrIndex = convoJSON.usersInConvo.findIndex(
+        (user) => user.userId === req.user.id
+      )),
+        (conversations[i] = convoJSON);
     }
 
     res.json(conversations);

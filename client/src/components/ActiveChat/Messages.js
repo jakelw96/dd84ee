@@ -19,21 +19,6 @@ const Messages = (props) => {
   const classes = useStyles();
   const { conversation, user } = props;
 
-  const updateMessages = () => {
-    if (conversation.usersInConvo) {
-      const currUserMessageData = conversation.usersInConvo.find(
-        (data) => data.userId === conversation.otherUser.id
-      );
-      if (currUserMessageData.lastReadMessage) {
-        return currUserMessageData.lastReadMessage.id;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  };
-
   return (
     <Box>
       {conversation.messages.map((message) => {
@@ -44,7 +29,8 @@ const Messages = (props) => {
             <SenderBubble text={message.text} time={time} />
             {/* Profile image icon indicating a message was read,
             only appears when the last messages from other user is read */}
-            {updateMessages() === message.id && (
+            {conversation.usersInConvo[conversation.currUserInConvoArrIndex]
+              .lastReadMessage.id === message.id && (
               <img
                 src={conversation.otherUser.photoUrl}
                 alt="Read"

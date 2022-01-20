@@ -115,9 +115,10 @@ export const updateCurrConvo = (userId, currConvoId) => {
 export const postMessage = (body) => async (dispatch, getState) => {
   try {
     const data = await saveMessage(body);
+    const state = getState();
 
     if (!body.conversationId) {
-      dispatch(addConversation(body.recipientId, data.message));
+      dispatch(addConversation(body.recipientId, data.message, state.user.id));
     } else {
       dispatch(setNewMessage(data.message, data.sender, body.recipientId));
     }

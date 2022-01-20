@@ -29,7 +29,7 @@ export const addMessageToStore = (state, payload) => {
       },
       {
         userId: message.senderId,
-        currActiveConvo: null,
+        currActiveConvo: newConvo.id,
         lastReadMessage: getLastReadMessage(
           message.senderId,
           newConvo.messages
@@ -40,6 +40,9 @@ export const addMessageToStore = (state, payload) => {
         ),
       },
     ];
+    newConvo.currUserInConvoArrIndex = newConvo.usersInConvo.findIndex(
+      (user) => user.userId === recipientId
+    );
 
     return [newConvo, ...state];
   }
@@ -66,6 +69,9 @@ export const addMessageToStore = (state, payload) => {
             ]),
           };
         }),
+        currUserInConvoArrIndex: convo.usersInConvo.findIndex(
+          (user) => user.userId !== convo.otherUser.id
+        ),
       };
     } else {
       return convo;
@@ -117,13 +123,12 @@ export const addSearchedUsersToStore = (state, users) => {
   return newState;
 };
 
-export const addNewConvoToStore = (state, recipientId, message) => {
+export const addNewConvoToStore = (state, recipientId, message, currUserId) => {
   return state.map((convo) => {
     if (convo.otherUser.id === recipientId) {
       // Returning a new object with the original state and updated with id,
       // messages, and latestMessageText
-      console.log(convo);
-      console.log(recipientId);
+
       return {
         ...convo,
         id: message.conversationId,
@@ -144,7 +149,7 @@ export const addNewConvoToStore = (state, recipientId, message) => {
           },
           {
             userId: message.senderId,
-            currActiveConvo: null,
+            currActiveConvo: message.conversationId,
             lastReadMessage: getLastReadMessage(message.senderId, [
               ...convo.messages,
               message,
@@ -155,6 +160,9 @@ export const addNewConvoToStore = (state, recipientId, message) => {
             ]),
           },
         ],
+        // currUserInConvoArrIndex: convo.usersInConvo.findIndex(
+        //   (user) => user.userId === currUserId
+        // ),
       };
     } else {
       return convo;
