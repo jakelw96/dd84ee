@@ -47,6 +47,35 @@ router.get("/", async (req, res, next) => {
       ],
     });
 
+    const countUnreadMessages = async (otherUser) => {
+      const unreadMessageCounter = await Message.count({
+        where: {
+          isRead: false,
+          senderId: otherUser,
+        },
+      }).then((count) => {
+        return count;
+      });
+
+      return unreadMessageCounter;
+    };
+
+    const getLastReadMessage = (userId, messages) => {
+      const readMessages = messages.filter((message) => {
+        if (userId !== message.senderId) {
+          if (message.isRead === true) {
+            return message;
+          }
+        }
+      });
+
+      if (readMessages.length > 0) {
+        return readMessages[readMessages.length - 1];
+      } else {
+        return null;
+      }
+    };
+
     for (let i = 0; i < conversations.length; i++) {
       const convo = conversations[i];
       const convoJSON = convo.toJSON();
@@ -67,9 +96,32 @@ router.get("/", async (req, res, next) => {
         convoJSON.otherUser.online = false;
       }
 
-      // set properties for notification count and latest message preview
+      // set properties for notification count and latest message preview and
+      // unread message object for both users
       convoJSON.latestMessageText = convoJSON.messages[0].text;
-      conversations[i] = convoJSON;
+      convoJSON.usersInConvo = [
+        {
+          userId: req.user.id,
+          currActiveConvo: null,
+          lastReadMessage: getLastReadMessage(req.user.id, convoJSON.messages),
+          unreadMessagesCount: await countUnreadMessages(
+            convoJSON.otherUser.id
+          ),
+        },
+        {
+          userId: convoJSON.otherUser.id,
+          currActiveConvo: null,
+          lastReadMessage: getLastReadMessage(
+            convoJSON.otherUser.id,
+            convoJSON.messages
+          ),
+          unreadMessagesCount: await countUnreadMessages(req.user.id),
+        },
+      ];
+      (convoJSON.otherUserInConvoArrIndex = convoJSON.usersInConvo.findIndex(
+        (user) => user.userId === convoJSON.otherUser.id
+      )),
+        (conversations[i] = convoJSON);
     }
 
     res.json(conversations);

@@ -26,6 +26,7 @@ router.post("/register", async (req, res, next) => {
       process.env.SESSION_SECRET,
       { expiresIn: 86400 }
     );
+
     res.json({
       ...user.dataValues,
       token,

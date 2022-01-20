@@ -44,6 +44,18 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("new-message", {
       message: data.message,
       sender: data.sender,
+      recipientId: data.recipientId,
+    });
+  });
+
+  socket.on("update-conversation", (conversation) => {
+    socket.broadcast.emit("update-conversation", conversation);
+  });
+
+  socket.on("update-curr-convo", (data) => {
+    socket.broadcast.emit("update-curr-convo", {
+      userId: data.userId,
+      currConvoId: data.currConvoId,
     });
   });
 
