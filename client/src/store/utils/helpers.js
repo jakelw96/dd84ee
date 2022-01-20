@@ -59,8 +59,8 @@ export const updateCurrentUser = (convo) => {
         ]),
       };
     }),
-    currUserInConvoArrIndex: convo.usersInConvo.findIndex(
-      (user) => user.userId !== convo.otherUser.id
+    otherUserInConvoArrIndex: convo.usersInConvo.findIndex(
+      (user) => user.userId === convo.otherUser.id
     ),
   };
 };
@@ -93,8 +93,8 @@ export const updateOtherUser = (convo) => {
         ]),
       };
     }),
-    currUserInConvoArrIndex: convo.usersInConvo.findIndex(
-      (user) => user.userId !== convo.otherUser.id
+    otherUserInConvoArrIndex: convo.usersInConvo.findIndex(
+      (user) => user.userId === convo.otherUser.id
     ),
   };
 };
@@ -123,8 +123,8 @@ export const updateBothUsers = (convo) => {
         ]),
       };
     }),
-    currUserInConvoArrIndex: convo.usersInConvo.findIndex(
-      (user) => user.userId !== convo.otherUser.id
+    otherUserInConvoArrIndex: convo.usersInConvo.findIndex(
+      (user) => user.userId === convo.otherUser.id
     ),
   };
 };

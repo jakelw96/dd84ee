@@ -40,8 +40,8 @@ export const addMessageToStore = (state, payload) => {
         ),
       },
     ];
-    newConvo.currUserInConvoArrIndex = newConvo.usersInConvo.findIndex(
-      (user) => user.userId === recipientId
+    newConvo.otherUserInConvoArrIndex = newConvo.usersInConvo.findIndex(
+      (user) => user.userId !== recipientId
     );
 
     return [newConvo, ...state];
@@ -69,8 +69,8 @@ export const addMessageToStore = (state, payload) => {
             ]),
           };
         }),
-        currUserInConvoArrIndex: convo.usersInConvo.findIndex(
-          (user) => user.userId !== convo.otherUser.id
+        otherUserInConvoArrIndex: convo.usersInConvo.findIndex(
+          (user) => user.userId === convo.otherUser.id
         ),
       };
     } else {

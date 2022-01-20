@@ -29,14 +29,21 @@ const Messages = (props) => {
             <SenderBubble text={message.text} time={time} />
             {/* Profile image icon indicating a message was read,
             only appears when the last messages from other user is read */}
-            {conversation.usersInConvo[conversation.currUserInConvoArrIndex]
-              .lastReadMessage.id === message.id && (
-              <img
-                src={conversation.otherUser.photoUrl}
-                alt="Read"
-                className={classes.readIcon}
-              />
-            )}
+            {!!conversation.otherUserInConvoArrIndex &&
+              conversation.usersInConvo[conversation.otherUserInConvoArrIndex]
+                .lastReadMessage && (
+                <Box>
+                  {conversation.usersInConvo[
+                    conversation.otherUserInConvoArrIndex
+                  ].lastReadMessage.id === message.id && (
+                    <img
+                      src={conversation.otherUser.photoUrl}
+                      alt="Read"
+                      className={classes.readIcon}
+                    />
+                  )}
+                </Box>
+              )}
           </Box>
         ) : (
           <OtherUserBubble

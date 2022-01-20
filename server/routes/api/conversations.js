@@ -118,8 +118,8 @@ router.get("/", async (req, res, next) => {
           unreadMessagesCount: await countUnreadMessages(req.user.id),
         },
       ];
-      (convoJSON.currUserInConvoArrIndex = convoJSON.usersInConvo.findIndex(
-        (user) => user.userId === req.user.id
+      (convoJSON.otherUserInConvoArrIndex = convoJSON.usersInConvo.findIndex(
+        (user) => user.userId === convoJSON.otherUser.id
       )),
         (conversations[i] = convoJSON);
     }
