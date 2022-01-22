@@ -10,13 +10,15 @@ router.get("/", async (req, res, next) => {
     if (!req.user) {
       return res.sendStatus(401);
     }
+    
     const userId = req.user.id;
     const conversations = await Conversation.findAll({
       where: {
-        [Op.or]: {
-          user1Id: userId,
-          user2Id: userId,
-        },
+        
+        // [Op.or]: {
+        //   user1Id: userId,
+        //   user2Id: userId,
+        // },
       },
       attributes: ["id"],
       order: [[Message, "createdAt", "DESC"]],
