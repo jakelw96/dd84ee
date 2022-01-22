@@ -3,7 +3,7 @@ const db = require("../db");
 
 const Conversation = db.define("conversation", {
   id: {
-    type: Sequelize.Integer,
+    type: Sequelize.INTEGER,
     allowNull: false,
     autoIncrement: true,
   },

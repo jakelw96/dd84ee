@@ -160,9 +160,6 @@ export const addNewConvoToStore = (state, recipientId, message, currUserId) => {
             ]),
           },
         ],
-        // currUserInConvoArrIndex: convo.usersInConvo.findIndex(
-        //   (user) => user.userId === currUserId
-        // ),
       };
     } else {
       return convo;
