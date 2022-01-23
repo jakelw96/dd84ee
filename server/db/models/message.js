@@ -10,9 +10,9 @@ const Message = db.define("message", {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-  isReadBy: {
-    type: Sequelize.ARRAY(Sequelize.STRING),
-  },
+  // isReadBy: {
+  //   type: Sequelize.ARRAY(Sequelize.STRING),
+  // },
 });
 
 module.exports = Message;
