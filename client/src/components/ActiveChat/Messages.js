@@ -28,7 +28,7 @@ const Messages = (props) => {
           <Box key={message.id}>
             <SenderBubble text={message.text} time={time} />
             {/* Profile image icon indicating a message was read,
-            only appears when the last messages from other user is read */}
+            only appears on the last message that was read by a user */}
             {!!conversation.otherUserInConvoArrIndex &&
               conversation.usersInConvo[conversation.otherUserInConvoArrIndex]
                 .lastReadMessage && (
